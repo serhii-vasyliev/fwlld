@@ -1,0 +1,55 @@
+---
+- name: Install firewalld packages
+  yum: state=present name={{ item }}
+  loop:
+  - firewalld-filesystem
+  - firewalld
+
+- name: Enable firewalld service
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: Add specific zones to firewall
+  firewalld: 
+    zone: "{{ item.name }}"
+    state: present
+    permanent: yes
+  notify: reload firewalld
+  loop: "{{ fwlld_zones }}"
+
+- name: firewalld services
+  firewalld: 
+    zone: "{{ item.0.name }}"
+    service: "{{ item.1 }}"
+    state: enabled
+    permanent: yes
+  notify: reload firewalld
+  with_subelements:
+    - "{{ fwlld_zones | default([]) }}"
+    - services 
+
+- name: firewalld ports
+  firewalld: 
+    zone: "{{ item.0.name }}"
+    port: "{{ item.1 }}/tcp"
+    state: enabled
+    permanent: yes
+  notify: reload firewalld
+  with_subelements:
+    - "{{ fwlld_zones | default([]) }}"
+    - ports 
+
+- name: firewalld services
+  firewalld: 
+    zone: "{{ item.0.name }}"
+    source: "{{ item.1 }}"
+    state: enabled
+    permanent: yes
+  notify: reload firewalld
+  with_subelements:
+    - "{{ fwlld_zones | default([]) }}"
+    - sources
+
+
