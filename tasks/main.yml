@@ -19,7 +19,7 @@
   notify: reload firewalld
   loop: "{{ fwlld_zones }}"
 
-- name: firewalld services
+- name: Add firewalld services to zones
   firewalld: 
     zone: "{{ item.0.name }}"
     service: "{{ item.1 }}"
@@ -29,19 +29,21 @@
   with_subelements:
     - "{{ fwlld_zones | default([]) }}"
     - services 
+    - skip_missing: true
 
-- name: firewalld ports
+- name: Add firewalld ports to zones
   firewalld: 
     zone: "{{ item.0.name }}"
-    port: "{{ item.1 }}/tcp"
+    port: "{{ item.1 }}"
     state: enabled
     permanent: yes
   notify: reload firewalld
   with_subelements:
     - "{{ fwlld_zones | default([]) }}"
     - ports 
+    - skip_missing: true
 
-- name: firewalld services
+- name: Add firewalld sources to zones
   firewalld: 
     zone: "{{ item.0.name }}"
     source: "{{ item.1 }}"
@@ -51,5 +53,42 @@
   with_subelements:
     - "{{ fwlld_zones | default([]) }}"
     - sources
+    - skip_missing: true
 
+
+- name: Remove firewalld services from zones
+  firewalld: 
+    zone: "{{ item.0.name }}"
+    service: "{{ item.1 }}"
+    state: disabled
+    permanent: yes
+  notify: reload firewalld
+  with_subelements:
+    - "{{ fwlld_zones | default([]) }}"
+    - remove_services
+    - skip_missing: true
+
+- name: Remove firewalld ports from zones
+  firewalld: 
+    zone: "{{ item.0.name }}"
+    port: "{{ item.1 }}"
+    state: disabled
+    permanent: yes
+  notify: reload firewalld
+  with_subelements:
+    - "{{ fwlld_zones | default([]) }}"
+    - remove_ports 
+    - skip_missing: true
+
+- name: Remove firewalld sources from zones
+  firewalld: 
+    zone: "{{ item.0.name }}"
+    source: "{{ item.1 }}"
+    state: disabled
+    permanent: yes
+  notify: reload firewalld
+  with_subelements:
+    - "{{ fwlld_zones | default([]) }}"
+    - remove_sources
+    - skip_missing: true
 
