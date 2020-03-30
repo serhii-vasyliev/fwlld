@@ -10,4 +10,3 @@ fwlld_remove_sshd_access_from_public:
 - name: public
   remove_services: ['ssh','dhcpv6-client']
 
-
