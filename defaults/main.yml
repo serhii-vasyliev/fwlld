@@ -1,3 +1,13 @@
 ---
 
 fwlld_zones: []
+
+fwlld_public_web_server:
+- name: public
+  services: ['http','https']
+
+fwlld_remove_sshd_access_from_public:
+- name: public
+  remove_services: ['ssh','dhcpv6-client']
+
+
